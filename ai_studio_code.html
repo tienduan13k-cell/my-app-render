@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trình chỉnh sửa Ảnh AI - TID Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #627b5d;
+            --secondary-color: #4a5d46;
+            --text-color: #e0e0e0;
+            --bg-color: #2c2c2c;
+            --border-color: #8c9d8a;
+            --accent-color: #a4c6a0;
+            --font-family-body: 'Roboto', sans-serif;
+            --font-family-heading: 'Orbitron', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family-body);
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 30px;
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: 700;
+            font-family: var(--font-family-heading);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            letter-spacing: 2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header .logo {
+            font-size: 1.2em;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+
+        .container {
+            flex-grow: 1;
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 20px auto;
+            background-color: #3a3a3a;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(164, 198, 160, 0.1) 0%, transparent 70%);
+            animation: pulse-glow 15s infinite alternate;
+            z-index: 1;
+        }
+
+        @keyframes pulse-glow {
+            0% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.1); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 0.1; }
+        }
+
+        .left-panel, .right-panel {
+            flex: 1;
+            padding: 25px;
+            border-radius: 12px;
+            background-color: #3a3a3a;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #2a2a2a;
+            border: 1px dashed var(--border-color);
+            min-height: 400px;
+        }
+
+        h2 {
+            color: var(--accent-color);
+            font-family: var(--font-family-heading);
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--accent-color);
+            font-weight: 700;
+            font-size: 0.95em;
+        }
+
+        select, textarea, input[type="file"] {
+            width: calc(100% - 20px);
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: #4a4a4a;
+            color: var(--text-color);
+            font-size: 1em;
+            box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        select:focus, textarea:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(164, 198, 160, 0.3);
+            outline: none;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .upload-area {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .upload-box {
+            flex: 1 1 calc(33% - 10px);
+            min-width: 150px;
+            height: 120px;
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            background-color: #4a4a4a;
+        }
+
+        .upload-box:hover {
+            border-color: var(--accent-color);
+            background-color: #5a5a5a;
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px rgba(164, 198, 160, 0.4);
+        }
+
+        .upload-box input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .upload-box .placeholder {
+            color: var(--border-color);
+            font-size: 0.9em;
+            line-height: 1.3;
+        }
+
+        .upload-box .icon {
+            font-size: 2.5em;
+            margin-bottom: 5px;
+            color: var(--accent-color);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #5a5a5a;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #6a6a6a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .output-display {
+            width: 100%;
+            height: calc(100% - 70px); /* Adjust based on button height */
+            background-color: #1c1c1c;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .output-display img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none; /* Hidden by default */
+        }
+
+        .output-display .placeholder {
+            color: var(--border-color);
+            font-style: italic;
+            font-size: 1.1em;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .output-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .output-buttons .btn {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            padding: 10px 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .output-buttons .btn:hover {
+            background-color: #8cb687;
+        }
+
+        .tech-glow {
+            animation: text-glow 1.5s infinite alternate;
+        }
+
+        @keyframes text-glow {
+            0% { text-shadow: 0 0 5px var(--accent-color); }
+            100% { text-shadow: 0 0 15px var(--accent-color), 0 0 25px var(--accent-color); }
+        }
+
+        .nano-banana-footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--border-color);
+            font-size: 0.85em;
+            background-color: #222;
+            margin-top: 20px;
+            border-top: 1px solid #444;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+                margin: 15px auto;
+                padding: 15px;
+            }
+            .left-panel, .right-panel {
+                padding: 20px;
+            }
+            .header {
+                font-size: 1.5em;
+                padding: 10px 20px;
+            }
+            .header .logo {
+                font-size: 1em;
+            }
+            .upload-box {
+                flex: 1 1 calc(50% - 10px);
+                height: 100px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header {
+                font-size: 1.2em;
+                padding: 10px 15px;
+            }
+            .header .logo {
+                display: none; /* Hide logo on very small screens */
+            }
+            .button-group {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                padding: 10px;
+            }
+            .upload-box {
+                flex: 1 1 100%;
+                height: 80px;
+            }
+            .left-panel, .right-panel {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <span>TID Studio</span>
+        <span class="logo tech-glow">AI Photo Editor</span>
+    </header>
+
+    <div class="container">
+        <div class="left-panel">
+            <h2>Chức năng chỉnh sửa ảnh</h2>
+
+            <div class="form-group">
+                <label for="context">Bối cảnh</label>
+                <select id="context">
+                    <option value="morning">Buổi sáng</option>
+                    <option value="noon">Buổi trưa</option>
+                    <option value="afternoon">Buổi chiều</option>
+                    <option value="evening">Buổi tối</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Tải ảnh lên (Hỗ trợ JPG, PNG, WEBP)</label>
+                <div class="upload-area">
+                    <div class="upload-box" id="upload-box-1">
+                        <span class="icon">&#x219Up;</span>
+                        <span class="placeholder">Ảnh 1<br>(hoặc kéo thả)</span>
+                        <input type="file" accept=".jpg, .png, .webp" id="file-upload-1">
+                    </div>
+                    <div class="upload-box" id="upload-box-2">
+                        <span class="icon">&#x219Up;</span>
+                        <span class="placeholder">Ảnh 2<br>(hoặc kéo thả)</span>
+                        <input type="file" accept=".jpg, .png, .webp" id="file-upload-2">
+                    </div>
+                    <div class="upload-box" id="upload-box-3">
+                        <span class="icon">&#x219Up;</span>
+                        <span class="placeholder">Ảnh 3<br>(hoặc kéo thả)</span>
+                        <input type="file" accept=".jpg, .png, .webp" id="file-upload-3">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Mô tả yêu cầu chỉnh sửa</label>
+                <textarea id="description" placeholder="Ví dụ: 'Chuyển thành phong cách anime với bầu trời hoàng hôn rực rỡ và các đám mây hồng tím.'"></textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" id="random-prompt-btn">Tạo gợi ý ngẫu nhiên</button>
+                <button class="btn btn-secondary" id="clear-btn">Xoá bỏ</button>
+            </div>
+
+            <button class="btn btn-primary" id="generate-image-btn">Tạo Ảnh</button>
+        </div>
+
+        <div class="right-panel">
+            <h2>Kết quả đầu ra</h2>
+            <div class="output-display" id="output-display">
+                <img id="generated-image" src="" alt="Ảnh đã chỉnh sửa" style="display: none;">
+                <p class="placeholder" id="output-placeholder">Ảnh của bạn sẽ hiển thị ở đây sau khi tạo.</p>
+            </div>
+            <div class="output-buttons">
+                <button class="btn btn-primary" id="save-jpg-btn" disabled>Lưu ảnh .JPG</button>
+                <button class="btn btn-primary" id="save-png-btn" disabled>Lưu ảnh .PNG</button>
+                <button class="btn btn-primary" id="save-webp-btn" disabled>Lưu ảnh .WEBP</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="nano-banana-footer">
+        Được tạo bởi TID Studio với <span class="tech-glow">Nano Banana AI</span> | &copy; 2023
+    </footer>
+
+    <script>
+        // Placeholder for Nano Banana AI integration
+        // This is where you would integrate with a backend AI service
+        // and Nano Banana's framework for UI components and data flow.
+
+        const uploadBoxes = document.querySelectorAll('.upload-box');
+        const fileInputs = document.querySelectorAll('.upload-box input[type="file"]');
+        const descriptionTextArea = document.getElementById('description');
+        const randomPromptBtn = document.getElementById('random-prompt-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const generateImageBtn = document.getElementById('generate-image-btn');
+        const generatedImage = document.getElementById('generated-image');
+        const outputPlaceholder = document.getElementById('output-placeholder');
+        const saveJpgBtn = document.getElementById('save-jpg-btn');
+        const savePngBtn = document.getElementById('save-png-btn');
+        const saveWebpBtn = document.getElementById('save-webp-btn');
+        const contextSelect = document.getElementById('context');
+
+        // Sample prompts for AI suggestions
+        const prompts = {
+            morning: [
+                "Thêm ánh nắng vàng ấm áp của buổi sáng, sương sớm lấp lánh trên cỏ.",
+                "Biến bầu trời thành màu xanh trong trẻo với những đám mây trắng bồng bềnh, tạo cảm giác tươi mới.",
+                "Chuyển phong cách thành tranh màu nước với tông màu pastel nhẹ nhàng của bình minh."
+            ],
+            noon: [
+                "Tăng cường độ sáng và độ tương phản, làm nổi bật chi tiết dưới ánh nắng mặt trời gay gắt.",
+                "Tạo hiệu ứng 'golden hour' cho dù là buổi trưa, với ánh sáng rực rỡ và bóng đổ rõ nét.",
+                "Chuyển đổi cảnh quan thành một khu rừng nhiệt đới dưới ánh nắng chói chang, thêm động vật hoang dã."
+            ],
+            afternoon: [
+                "Thêm tông màu cam, hồng của hoàng hôn, tạo bóng dài và mềm mại.",
+                "Phong cách cổ điển với ánh sáng xiên và màu sắc trầm ấm, như một bức tranh sơn dầu cũ.",
+                "Hiệu ứng 'bokeh' làm mờ hậu cảnh, tập trung vào chủ thể dưới ánh chiều tà lãng mạn."
+            ],
+            evening: [
+                "Biến bầu trời thành màu tím than, thêm ánh đèn thành phố lấp lánh hoặc dải ngân hà rõ nét.",
+                "Tạo không khí huyền bí, ma mị với ánh trăng bạc và sương mù nhẹ.",
+                "Phong cách neon cyberpunk, với ánh sáng rực rỡ từ các biển hiệu và tòa nhà trong đêm."
+            ]
+        };
+
+        let currentGeneratedImageBlob = null; // To store the image for saving
+
+        // Handle file uploads
+        fileInputs.forEach((input, index) => {
+            const uploadBox = uploadBoxes[index];
+            input.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        uploadBox.innerHTML = `<img src="${e.target.result}" alt="Uploaded image">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Handle drag and drop
+            uploadBox.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadBox.style.borderColor = varCss('--accent-color');
+                uploadBox.style.backgroundColor = '#5a5a5a';
+            });
+
+            uploadBox.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadBox.style.borderColor = varCss('--border-color');
+                uploadBox.style.backgroundColor = '#4a4a4a';
+            });
+
+            uploadBox.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadBox.style.borderColor = varCss('--border-color');
+                uploadBox.style.backgroundColor = '#4a4a4a';
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    input.files = files; // Assign files to input
+                    input.dispatchEvent(new Event('change')); // Trigger change event
+                }
+            });
+        });
+
+        // Helper to get CSS variable
+        function varCss(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+
+        // Random Prompt button functionality
+        randomPromptBtn.addEventListener('click', () => {
+            const selectedContext = contextSelect.value;
+            const contextPrompts = prompts[selectedContext];
+            if (contextPrompts && contextPrompts.length > 0) {
+                const randomIndex = Math.floor(Math.random() * contextPrompts.length);
+                descriptionTextArea.value = contextPrompts[randomIndex];
+            }
+        });
+
+        // Clear button functionality
+        clearBtn.addEventListener('click', () => {
+            descriptionTextArea.value = '';
+            fileInputs.forEach((input, index) => {
+                input.value = null; // Clear selected file
+                const uploadBox = uploadBoxes[index];
+                uploadBox.innerHTML = `
+                    <span class="icon">&#x219Up;</span>
+                    <span class="placeholder">Ảnh ${index + 1}<br>(hoặc kéo thả)</span>
+                    <input type="file" accept=".jpg, .png, .webp" id="file-upload-${index + 1}">
+                `;
+            });
+            generatedImage.style.display = 'none';
+            generatedImage.src = '';
+            outputPlaceholder.style.display = 'block';
+            currentGeneratedImageBlob = null;
+            saveJpgBtn.disabled = true;
+            savePngBtn.disabled = true;
+            saveWebpBtn.disabled = true;
+        });
+
+        // Generate Image button functionality (simulated)
+        generateImageBtn.addEventListener('click', async () => {
+            const description = descriptionTextArea.value;
+            const context = contextSelect.value;
+            const files = Array.from(fileInputs).map(input => input.files[0]).filter(Boolean);
+
+            if (!description && files.length === 0) {
+                alert('Vui lòng nhập mô tả hoặc tải ảnh lên để tạo ảnh.');
+                return;
+            }
+
+            // Simulate AI processing
+            outputPlaceholder.textContent = 'Đang tạo ảnh AI...';
+            outputPlaceholder.style.display = 'block';
+            generatedImage.style.display = 'none';
+            saveJpgBtn.disabled = true;
+            savePngBtn.disabled = true;
+            saveWebpBtn.disabled = true;
+
+            // In a real application, you would send this data to your AI backend
+            // For this example, we'll generate a placeholder image.
+            await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate network delay
+
+            // Generate a placeholder image (replace with actual AI output)
+            // Example: Using a service like Placehold.co or a local dummy image
+            const dummyImageUrl = `https://placehold.co/600x400/627b5d/ffffff?text=AI+Generated+Image&font=orbitron&bold=true`;
+            
+            fetch(dummyImageUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    currentGeneratedImageBlob = blob;
+                    generatedImage.src = URL.createObjectURL(blob);
+                    generatedImage.style.display = 'block';
+                    outputPlaceholder.style.display = 'none';
+                    saveJpgBtn.disabled = false;
+                    savePngBtn.disabled = false;
+                    saveWebpBtn.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Lỗi khi tải ảnh mô phỏng:', error);
+                    outputPlaceholder.textContent = 'Đã xảy ra lỗi khi tạo ảnh.';
+                    outputPlaceholder.style.display = 'block';
+                });
+        });
+
+        // Save image functionality
+        function saveImage(format) {
+            if (currentGeneratedImageBlob) {
+                const a = document.createElement('a');
+                a.href = generatedImage.src;
+                a.download = `AI_Image_TID_Studio.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } else {
+                alert('Không có ảnh nào để lưu.');
+            }
+        }
+
+        saveJpgBtn.addEventListener('click', () => saveImage('jpg'));
+        savePngBtn.addEventListener('click', () => saveImage('png'));
+        saveWebpBtn.addEventListener('click', () => saveImage('webp'));
+
+        // Initial prompt suggestion based on default context
+        randomPromptBtn.click();
+
+    </script>
+</body>
+</html>
